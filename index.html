@@ -2,16 +2,68 @@
 <html>
     <head>
         <meta charset="utf-8">
-        <title>Hello, world!</title>
+        <title>Traitement d'images</title>
+
+		<link rel="stylesheet" href="main.css" type="text/css" media="all">
+
+		<script src="https://kit.fontawesome.com/f69c2bce58.js"></script>
+    </head>
+
+    <body>
+		<div class= "container">
+		
+			<p>Filtre caméra</p>
+
+			<div class= "camera">
+				<video id="video">Video stream not available.</video>
+				<canvas id="mycanvas"></canvas>
+				<button id="startbutton" class="icon icon-enter"><i class="fas fa-camera"></i></button> 
+				<img id="photo" alt="The screen capture will appear in this box."> 	
+			</div>
+
+			<div class= "stars_1">
+				<img src="./image/star.svg" alt="">
+			</div>
+
+			<div class= "stars_2">
+				<img src="./image/star2.svg" alt="">
+			</div>
+			
+			<div class="buttons__container">
+				<div class="title">
+					<h2>Image sans voisinage</h2>
+				</div>
+				<div class="buttons">
+					<button id="invertbutton">Négatif</button>
+					<button id="graybutton">Gris</button>
+					<button id="blackbutton">Noir et blanc</button>
+					<button id="redcanalbutton">Canal rouge</button>
+					<button id="addnoisebutton">Ajouter du bruit</button>
+					<button id="tvnoisebutton">Bruit TV</button>
+					<button id="addluminositybutton">+ de luminosité</button>
+					<button id="removeluminositybutton">- de luminosité</button>
+				  </div>
+			</div>
+	
+			<div class="buttons__container">
+				<div class="title">
+					<h2>Image avec voisinage</h2>
+				</div>
+				<div class="buttons">
+					<button id="verticalmirrorbutton">Miroir vertical</button>
+					<button id="horizontalmirrorbutton">Miroir horizontal</button>
+					<button id="blurbutton">Flou</button>
+					<button id="frenchybutton">Drapeau français</button>
+				</div>
+			</div>
+	
+			<div class="copyright">
+				<p>© Snapshot from webcam by WebRTC - <a target="_blank" href="https://developer.mozilla.org/en-US/docs/Web/API/WebRTC_API/Taking_still_photos">source</a></p>
+			</div>
+
+		</div>
+
 		<script src="capture.js"></script>
 		<script src="filter.js"></script>
-		<link rel="stylesheet" href="main.css" type="text/css" media="all">
-    </head>
-    <body>
-		<video id="video">Video stream not available.</video>
-		<button id="startbutton">Take photo</button> 
-		<button id="invertbutton">Mon filtre</button> 
-		<canvas id="mycanvas"></canvas>
-		<img id="photo" alt="The screen capture will appear in this box."> 
 	</body>
 </html>
