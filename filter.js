@@ -85,10 +85,42 @@
 
 		// Loop over each pixel and invert the color.
 		for (var i = 0, n = pix.length; i < n; i += 4) {
-			// Add black and white  pix[i] <= 128 ? 0 : 255;
-			pix[i] = pix[i] <= 128 ? 0 : 255; // red
-			pix[i+1] = pix[i+1] <= 128 ? 0 : 255; // green
-			pix[i+2] = pix[i+2] <= 128 ? 0 : 255; // blue
+			// Add average and if > 128 so add 255 else 0
+			let average =(pix[i] + pix[i+1] + pix[i+2])/3;
+				
+			pix[i] = average > 128 ? 255 : 0; // red
+			pix[i+1] = average > 128 ? 255 : 0; // green
+			pix[i+2] = average > 128 ? 255 : 0; // blue
+			// i+3 is alpha (the fourth element)
+		}
+
+		// Draw the ImageData at the given (x,y) coordinates.
+		context.putImageData(imgd, x, y);
+
+		var data = canvas.toDataURL('image/png');
+		photo.setAttribute('src', data);
+	}
+
+	function myBurn(){
+		var photo = document.getElementById('photo');
+		var canvas = document.getElementById('mycanvas');
+		var context = canvas.getContext('2d');
+
+		// Get the CanvasPixelArray from the given coordinates and dimensions.
+		x = 0;
+		y = 0;
+		width = canvas.width;
+		height = canvas.height;
+
+		var imgd = context.getImageData(x, y, width, height);
+		var pix = imgd.data;
+
+		// Loop over each pixel and invert the color.
+		for (var i = 0, n = pix.length; i < n; i += 4) {
+
+			pix[i] = pix[i] > 128 ? 255 : 0; // red
+			pix[i+1] = pix[i+1] > 128 ? 255 : 0; // green
+			pix[i+2] = pix[i+2] > 128 ? 255 : 0; // blue
 			// i+3 is alpha (the fourth element)
 		}
 
@@ -413,10 +445,70 @@
 		photo.setAttribute('src', data);
 	}
 
+	function myBlur(){
+		var photo = document.getElementById('photo');
+		var canvas = document.getElementById('mycanvas');
+		var context = canvas.getContext('2d');
+
+		// Get the CanvasPixelArray from the given coordinates and dimensions.
+		x = 0;
+		y = 0;
+		width = canvas.width;
+		height = canvas.height;
+
+		var imgd = context.getImageData(x, y, width, height);
+		var pix = imgd.data;
+
+		// 1 tab 1D -> 4 tab 2D (r,g,b,a)
+		var tr = new Array(width).fill().map(() => Array(height));
+		var tg = new Array(width).fill().map(() => Array(height));
+		var tb = new Array(width).fill().map(() => Array(height));
+		var ta = new Array(width).fill().map(() => Array(height));
+
+		//  copy values
+		for (var y = 0; y < height; y++) {
+			for (var x = 0; x < width; x++) {
+				tr[x][y] = pix[x*4+y*(width*4)+0];
+				tg[x][y] = pix[x*4+y*(width*4)+1];
+				tb[x][y] = pix[x*4+y*(width*4)+2];
+				ta[x][y] = pix[x*4+y*(width*4)+3];
+			}
+		}
+
+		// Add blur
+		for (var y = 1; y < (height-1); y++) {
+			for (var x = 1; x < (width-1); x++) {
+				tr[x][y] = (tr[x-1][y-1] + tr[x][y-1] + tr[x+1][y-1] + tr[x-1][y] + tr[x][y] + tr[x+1][y] + tr[x-1][y+1] + tr[x][y+1] + tr[x+1][y+1]) / 9;
+				tg[x][y] = (tg[x-1][y-1] + tg[x][y-1] + tg[x+1][y-1] + tg[x-1][y] + tg[x][y] + tg[x+1][y] + tg[x-1][y+1] + tg[x][y+1] + tg[x+1][y+1]) / 9;
+				tb[x][y] = (tb[x-1][y-1] + tb[x][y-1] + tb[x+1][y-1] + tb[x-1][y] + tb[x][y] + tb[x+1][y] + tb[x-1][y+1] + tb[x][y+1] + tb[x+1][y+1]) / 9;
+				// ta[x][y] = ta[x][y];
+			}
+		}
+
+		// RETOUR EN 1D POUR AFFICHER LES MODIFICATIONS
+		// 4 tab 2D (r,g,b,a) -> 1 tab 1D POUR METTRE A JOUR L'IMAGE
+		for (var y = 0; y < height; y++) {
+			for (var x = 0; x < width; x++) {
+				// - 1 array starts at 0 not 1
+				pix[x*4+y*(width*4)+0] = tr[x][y];
+				pix[x*4+y*(width*4)+1] = tg[x][y];
+				pix[x*4+y*(width*4)+2] = tb[x][y];
+				pix[x*4+y*(width*4)+3] = ta[x][y];
+			}
+		}
+
+		// Draw the ImageData at the given (x,y) coordinates.
+		context.putImageData(imgd, 0, 0);
+
+		var data = canvas.toDataURL('image/png');
+		photo.setAttribute('src', data);
+	}
+
 	function afterload(){
 		invertbutton = document.getElementById('invertbutton');
 		graybutton = document.getElementById('graybutton');
 		blacknwhitebutton = document.getElementById('blacknwhitebutton');
+		burnbutton = document.getElementById('burnbutton');
 		redcanalbutton = document.getElementById('redcanalbutton');
 		pinkcanalbutton = document.getElementById('pinkcanalbutton');
 		grayncolorbutton = document.getElementById('grayncolorbutton');
@@ -426,7 +518,6 @@
 		removeluminositybutton = document.getElementById('removeluminositybutton');
 		mirrorbutton = document.getElementById('mirrorbutton');
 		blurbutton = document.getElementById('blurbutton');
-		frenchybutton = document.getElementById('frenchybutton');
 
 		invertbutton.addEventListener('click', function(ev){
 			myInvert();
@@ -438,6 +529,10 @@
 
 		blacknwhitebutton.addEventListener('click', function(ev){
 			myBlacknWhite();
+			}, false);
+
+		burnbutton.addEventListener('click', function(ev){
+			myBurn();
 			}, false);
 
 		redcanalbutton.addEventListener('click', function(ev){
@@ -478,10 +573,6 @@
 
 		blurbutton.addEventListener('click', function(ev){
 			myBlur();
-			}, false);
-
-		frenchybutton.addEventListener('click', function(ev){
-			myFrenchy();
 			}, false);
 		}
 
